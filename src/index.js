@@ -25,6 +25,7 @@ function inputHandler(evt) {
     .then(data => {
       console.log(data);
       if (data.length > 10) {
+        cleanMarkup(countryList);
         Notify.info(
           'Too many matches found. Please enter a more specific name'
         );
