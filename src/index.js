@@ -4,21 +4,23 @@ import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import fetchCountries from './fetchCountries';
 
 const DEBOUNCE_DELAY = 300;
-
 const input = document.getElementById('search-box');
 const countryList = document.querySelector('.country-list');
 const countryInfo = document.querySelector('.country-info');
 const cleanMarkup = elm => (elm.innerHTML = '');
-
-const inputHandler = e => {
-  const textInput = e.target.value.trim();
-
+// const selectCountry = evt => {
+//   evt.preventDefault();
+//   console.log(evt.target.textContent);
+//   input.value = evt.target.textContent;
+//   return (textInput = input.value);
+// };
+function inputHandler(evt) {
+  const textInput = evt.target.value.trim();
   if (!textInput) {
     cleanMarkup(countryList);
     cleanMarkup(countryInfo);
     return;
   }
-
   fetchCountries(textInput)
     .then(data => {
       console.log(data);
@@ -35,9 +37,8 @@ const inputHandler = e => {
       cleanMarkup(countryInfo);
       Notify.failure('Oops, there is no country with that name');
     });
-};
-
-const renderMarkup = data => {
+}
+function renderMarkup(data) {
   if (data.length === 1) {
     cleanMarkup(countryList);
     const markupInfo = createInfoMarkup(data);
@@ -47,27 +48,42 @@ const renderMarkup = data => {
     const markupList = createListMarkup(data);
     countryList.innerHTML = markupList;
   }
-};
-
-const createListMarkup = data => {
+}
+function createListMarkup(data) {
   return data
     .map(
       ({ name, flags }) =>
-        `<li ><img src="${flags.png}" alt="${name.official}" width="60" height="40">${name.official}</li>`
+        `<li class="country-item">
+            <img src="${flags.png}" alt="${name.official}" width="40" height="20"> 
+            <p class="country-name">${name.official}</p>
+        </li>`
     )
     .join('');
-};
-
-const createInfoMarkup = data => {
+}
+function createInfoMarkup(data) {
   return data.map(
     ({ name, capital, population, flags, languages }) =>
-      `<h1><img src="${flags.png}" alt="${
-        name.official
-      }" width="60" height="40">${name.official}</h1>
-      <p>Capital: ${capital}</p>
-      <p>Population: ${population}</p>
-      <p>Languages: ${Object.values(languages)}</p>`
+      `<div class="country-info">
+      <div class="country-info-main">
+        <img src="${flags.png}" alt="${name.official}" width="60" height="40">
+        <h3 class="country-info-title">${name.official}</h3>
+      </div>
+        <ul class"country-info-list">
+          <li class="country-info-item">
+            <p class="country-info-text">Capital: ${capital}</p>
+          </li>
+          <li class="country-info-item">
+            <p class="country-info-text">Population: ${population}</p>
+          </li>
+          <li class="country-info-item">
+            <p class="country-info-text">Languages: ${Object.values(
+              languages
+            )}</p>
+          </li>
+        </ul>
+      </div>`
   );
-};
+}
 
 input.addEventListener('input', debounce(inputHandler, DEBOUNCE_DELAY));
+// countryList.addEventListener('click', selectCountry);
